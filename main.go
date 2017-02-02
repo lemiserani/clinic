@@ -1,13 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		log.Fatal("$PORT must be set")
+	}
 	router := httprouter.New()
 	closure := NewClosureController(GetSession())
 	router.GET("/", Index)
@@ -20,5 +27,5 @@ func main() {
 	router.PUT("/closures/:id", closure.UpdateClosure)
 	router.GET("/kinds/receipt", KindsReceipt)
 	router.GET("/kinds/costs", KindsCosts)
-	log.Fatal(http.ListenAndServe("localhost:3000", router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", port), router))
 }
