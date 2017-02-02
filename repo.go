@@ -1,6 +1,6 @@
 package main
 
-import "clinic/model"
+import "github.com/lemiserani/clinic/model"
 
 var clinics model.Clinics
 

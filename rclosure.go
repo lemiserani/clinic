@@ -9,7 +9,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"clinic/model"
+	"github.com/lemiserani/clinic/model"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
