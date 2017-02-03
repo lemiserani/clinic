@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -37,7 +38,7 @@ func (cc ClosureController) GetClosure(w http.ResponseWriter, r *http.Request, p
 	oid := bson.ObjectIdHex(id)
 	u := model.Closure{}
 
-	if err := cc.session.DB("api_clinic").C("closures").FindId(oid).One(&u); err != nil {
+	if err := cc.session.DB(os.Getenv("DB")).C("closures").FindId(oid).One(&u); err != nil {
 		codeHTTP(w, 404, "Não encontrado registro!"+id)
 	} else {
 		uj, _ := json.Marshal(u)
@@ -54,7 +55,7 @@ func (cc ClosureController) CreateClosure(w http.ResponseWriter, r *http.Request
 	closure.ID = bson.NewObjectId()
 	closure.Created = time.Now()
 
-	cc.session.DB("api_clinic").C("closures").Insert(closure)
+	cc.session.DB(os.Getenv("DB")).C("closures").Insert(closure)
 	uj, _ := json.Marshal(closure)
 
 	w.Header().Set("Content-Type", "application/json")
@@ -67,7 +68,7 @@ func (cc ClosureController) UpdateClosure(w http.ResponseWriter, r *http.Request
 	id := p.ByName("id")
 	json.NewDecoder(r.Body).Decode(&closure)
 
-	cc.session.DB("api_clinic").C("closures").UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"name": closure.Name,
+	cc.session.DB(os.Getenv("DB")).C("closures").UpdateId(bson.ObjectIdHex(id), bson.M{"$set": bson.M{"name": closure.Name,
 		"value": closure.Value}})
 	codeHTTP(w, 201, "Atualizado com sucesso! "+id)
 }
@@ -81,7 +82,7 @@ func (cc ClosureController) RemoveClosure(w http.ResponseWriter, r *http.Request
 	}
 	oid := bson.ObjectIdHex(id)
 
-	if err := cc.session.DB("api_clinic").C("closures").RemoveId(oid); err != nil {
+	if err := cc.session.DB(os.Getenv("DB")).C("closures").RemoveId(oid); err != nil {
 		codeHTTP(w, 404, "Não encontrado registro! "+id)
 	} else {
 		codeHTTP(w, 200, "Deletado com sucesso! "+id)
@@ -100,7 +101,7 @@ func (cc ClosureController) SearchClosures(w http.ResponseWriter, r *http.Reques
 		// return
 	}
 	u := model.Closures{}
-	if err := cc.session.DB("api_clinic").C("closures").Find(bson.M{"month": month, "year": year, "clinic": clinic}).All(&u); err != nil {
+	if err := cc.session.DB(os.Getenv("DB")).C("closures").Find(bson.M{"month": month, "year": year, "clinic": clinic}).All(&u); err != nil {
 		i := "Não encontrado registros! month: " + r.URL.Query().Get("month") + " year: " + r.URL.Query().Get("year") + " clinic: " + clinic
 		codeHTTP(w, 404, i)
 	} else {
